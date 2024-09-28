@@ -1,4 +1,4 @@
-package com.lifeIsbeautiful.springsec_section1;
+package com.lifeIsbeautiful;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
