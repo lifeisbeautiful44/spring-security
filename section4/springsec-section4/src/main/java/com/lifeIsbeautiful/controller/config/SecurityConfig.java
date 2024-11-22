@@ -21,20 +21,22 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
-        http.authorizeHttpRequests((requests) -> requests
+        http.
+                csrf(csrf ->csrf.disable())
+                .authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/myAccount","/myBalance","/myCards","/myLoans").authenticated()
-                .requestMatchers("/contact","/notices").permitAll());
+                .requestMatchers("/contact","/notices","/register").permitAll());
 
         http.formLogin(withDefaults());
         http.httpBasic(withDefaults());
         return http.build();
     }
 
-    @Bean
-    public UserDetailsService getUserDetails(DataSource dataSource)
-    {
-        return new JdbcUserDetailsManager(dataSource);
-    }
+//    @Bean
+//    public UserDetailsService getUserDetails(DataSource dataSource)
+//    {
+//        return new JdbcUserDetailsManager(dataSource);
+//    }
 
     @Bean
     public PasswordEncoder getPasswordEncoder()
