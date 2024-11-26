@@ -1,4 +1,4 @@
-package com.lifeIsbeautiful.controller.config;
+package com.lifeIsbeautiful.config;
 
 import com.lifeIsbeautiful.controller.dto.request.CustomerRegistrationDTO;
 import com.lifeIsbeautiful.model.Customer;
@@ -15,12 +15,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class CustomerUserDetailServiceImpl implements UserDetailsService {
+public class CustomUserDetailServiceImpl implements UserDetailsService {
 
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public CustomerUserDetailServiceImpl(CustomerRepository customerRepository, PasswordEncoder passwordEncoder)
+    public CustomUserDetailServiceImpl(CustomerRepository customerRepository, PasswordEncoder passwordEncoder)
     {
         this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;

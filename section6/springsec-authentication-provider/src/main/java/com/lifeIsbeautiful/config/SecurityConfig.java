@@ -1,4 +1,4 @@
-package com.lifeIsbeautiful.controller.config;
+package com.lifeIsbeautiful.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,10 +22,10 @@ public class SecurityConfig {
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
         http.
-                csrf(csrf ->csrf.disable())
+                csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/myAccount","/myBalance","/myCards","/myLoans").authenticated()
-                .requestMatchers("/contact","/notices","/register").permitAll());
+                        .requestMatchers("/myAccount", "/myBalance", "/myCards", "/myLoans").authenticated()
+                        .requestMatchers("/contact", "/notices", "/register").permitAll());
 
         http.formLogin(withDefaults());
         http.httpBasic(withDefaults());
@@ -39,14 +39,12 @@ public class SecurityConfig {
 //    }
 
     @Bean
-    public PasswordEncoder getPasswordEncoder()
-    {
+    public PasswordEncoder getPasswordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
     @Bean
-    public CompromisedPasswordChecker passwordChecker()
-    {
+    public CompromisedPasswordChecker passwordChecker() {
         return new HaveIBeenPwnedRestApiPasswordChecker();
     }
 }
