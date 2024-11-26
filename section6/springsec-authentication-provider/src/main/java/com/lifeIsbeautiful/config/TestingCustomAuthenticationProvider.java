@@ -12,13 +12,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("prod")
-public class CustomUsernameAuthenticationProvider implements AuthenticationProvider {
+@Profile("!prod")
+public class TestingCustomAuthenticationProvider implements AuthenticationProvider {
 
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
-    public CustomUsernameAuthenticationProvider(CustomUserDetailServiceImpl customUserDetailService, PasswordEncoder passwordEncoder) {
+    public TestingCustomAuthenticationProvider(CustomUserDetailServiceImpl customUserDetailService, PasswordEncoder passwordEncoder) {
         this.userDetailsService = customUserDetailService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -28,12 +28,7 @@ public class CustomUsernameAuthenticationProvider implements AuthenticationProvi
         String username = authentication.getName();
         String rawPassword = authentication.getCredentials().toString();
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-
-        if (passwordEncoder.matches(rawPassword, userDetails.getPassword())) {
-            return new UsernamePasswordAuthenticationToken(username, userDetails.getPassword(), userDetails.getAuthorities());
-        } else {
-            throw new BadCredentialsException("Password did not match");
-        }
+        return new UsernamePasswordAuthenticationToken(username, userDetails.getPassword(), userDetails.getAuthorities());
     }
 
     @Override
