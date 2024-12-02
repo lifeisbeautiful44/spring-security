@@ -1,5 +1,6 @@
 package com.lifeIsbeautiful.config;
 
+import com.lifeIsbeautiful.exception.CustomAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -26,7 +27,7 @@ public class TestSecurityConfig {
                         .requestMatchers("/contact", "/notices", "/register").permitAll());
 
         http.formLogin(withDefaults());
-        http.httpBasic(withDefaults());
+        http.httpBasic(hcc -> hcc.authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
         return http.build();
     }
 
