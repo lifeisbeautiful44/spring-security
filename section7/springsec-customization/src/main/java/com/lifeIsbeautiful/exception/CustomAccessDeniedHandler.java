@@ -4,21 +4,21 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
-public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+    public void handle(HttpServletRequest request, HttpServletResponse response,
+                       AccessDeniedException accessDeniedException) throws IOException, ServletException {
         // Build the JSON response
         LocalDateTime dateTime = LocalDateTime.now();
-        String status = String.valueOf(HttpStatus.UNAUTHORIZED.value());
-        String message = (authException != null && authException.getMessage() != null) ? authException.getMessage() : "Authentication Failed";
+        String status = String.valueOf(HttpStatus.FORBIDDEN.value());
+        String message = (accessDeniedException != null && accessDeniedException.getMessage() != null) ? accessDeniedException.getMessage() : "Authorization Failed";
         String path = request.getRequestURI();
 
         String jsonResponse = String.format(
@@ -32,8 +32,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         );
 
         // Set response headers and body
-        response.setHeader("lhng-error-message", "Authentication Failed");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setHeader("lhng-error-message", "Authorization Failed");
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json");
         response.getWriter().write(jsonResponse);
 

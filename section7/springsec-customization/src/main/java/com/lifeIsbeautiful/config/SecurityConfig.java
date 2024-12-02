@@ -1,5 +1,6 @@
 package com.lifeIsbeautiful.config;
 
+import com.lifeIsbeautiful.exception.CustomAccessDeniedHandler;
 import com.lifeIsbeautiful.exception.CustomAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +33,8 @@ public class SecurityConfig {
                         .requestMatchers("/contact", "/notices", "/register").permitAll());
 
         http.formLogin(withDefaults());
-        http.httpBasic(hcc -> hcc.authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
+        http.httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
+        http.exceptionHandling(ehc -> ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));
         return http.build();
     }
 
