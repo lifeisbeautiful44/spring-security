@@ -1,28 +1,35 @@
 package com.lifeIsbeautiful.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import java.io.Serializable;
+
+
+import java.sql.Date;
 
 @Entity
-@Table(name = "customer")
-public class Customer implements Serializable {
+public class Customer {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "customer_id")
     private long id;
-    @Column(name = "email")
-    private String email;
-    @Column(name = "pwd")
 
+    private String name;
+
+    private String email;
+
+    @Column(name = "mobile_number")
+    private String mobileNumber;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String pwd;
-    @Column(name = "role")
 
     private String role;
 
-    public Customer()
-    {
-
-    }
+    @Column(name = "create_dt")
+    @JsonIgnore
+    private Date createDt;
 
     public long getId() {
         return id;
@@ -32,12 +39,28 @@ public class Customer implements Serializable {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getMobileNumber() {
+        return mobileNumber;
+    }
+
+    public void setMobileNumber(String mobileNumber) {
+        this.mobileNumber = mobileNumber;
     }
 
     public String getPwd() {
@@ -54,5 +77,26 @@ public class Customer implements Serializable {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public Date getCreateDt() {
+        return createDt;
+    }
+
+    public void setCreateDt(Date createDt) {
+        this.createDt = createDt;
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", mobileNumber='" + mobileNumber + '\'' +
+                ", pwd='" + pwd + '\'' +
+                ", role='" + role + '\'' +
+                ", createDt=" + createDt +
+                '}';
     }
 }
