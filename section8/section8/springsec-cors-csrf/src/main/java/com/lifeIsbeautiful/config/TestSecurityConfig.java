@@ -23,7 +23,7 @@ public class TestSecurityConfig {
         http.requiresChannel(rrc -> rrc.anyRequest().requiresInsecure()) //only HTTP
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/myAccount", "/myBalance", "/myCards", "/myLoans").authenticated()
+                        .requestMatchers("/myAccount", "/myBalance", "/myCards", "/myLoans", "/user").authenticated()
                         .requestMatchers("/contact", "/notices", "/register").permitAll());
 
         http.formLogin(withDefaults());
