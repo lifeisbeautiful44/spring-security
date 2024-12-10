@@ -47,6 +47,7 @@ public class TestSecurityConfig {
                     }
                 }))
                 .csrf(csrf -> csrf.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
+                        .ignoringRequestMatchers("/contact", "/register")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
 
                 .addFilterBefore(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
