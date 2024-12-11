@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CustomUserDetailServiceImpl implements UserDetailsService {
@@ -36,7 +37,11 @@ public class CustomUserDetailServiceImpl implements UserDetailsService {
         Customer userDetail = this.customerRepository.findByEmail(username).
                 orElseThrow(() -> new UsernameNotFoundException("User with username: "+ username + " not found"));
 
-        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(userDetail.getRole()));
+        List<GrantedAuthority> authorities = userDetail.getAuthorities().stream()
+                .map(authority -> new SimpleGrantedAuthority(authority.getName()))
+                .collect(Collectors.toList());
+
+//        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(userDetail.getRole()));
         return new User(userDetail.getEmail(),userDetail.getPwd(),authorities);
     }
 
