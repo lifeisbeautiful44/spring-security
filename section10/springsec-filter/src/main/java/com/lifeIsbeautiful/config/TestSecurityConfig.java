@@ -1,7 +1,10 @@
 package com.lifeIsbeautiful.config;
 
 import com.lifeIsbeautiful.exception.CustomAuthenticationEntryPoint;
+import com.lifeIsbeautiful.filter.AuthoritiesLoggingAtFilter;
+import com.lifeIsbeautiful.filter.AuthoritiesLoggingFilter;
 import com.lifeIsbeautiful.filter.CsrfCookieFilter;
+import com.lifeIsbeautiful.filter.RequestValidationBeforeFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,13 +53,18 @@ public class TestSecurityConfig {
                         .ignoringRequestMatchers("/contact", "/register")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
 
-                .addFilterBefore(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+                .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new AuthoritiesLoggingFilter(), BasicAuthenticationFilter.class)
+                .addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
+
+
                 .requiresChannel(rrc -> rrc.anyRequest().requiresInsecure()) //only HTTP
                 .authorizeHttpRequests((requests) -> requests
-                       /* .requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
-                        .requestMatchers("/myBalance").hasAnyAuthority("VIEWBALANCE", "VIEWACCOUNT")
-                        .requestMatchers("/myLoans").hasAuthority("VIEWLOANS")
-                        .requestMatchers("/myCards").hasAuthority("VIEWCARDS")*/
+                        /* .requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
+                         .requestMatchers("/myBalance").hasAnyAuthority("VIEWBALANCE", "VIEWACCOUNT")
+                         .requestMatchers("/myLoans").hasAuthority("VIEWLOANS")
+                         .requestMatchers("/myCards").hasAuthority("VIEWCARDS")*/
                         .requestMatchers("/myAccount").hasRole("USER")
                         .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/myLoans").hasRole("USER")
