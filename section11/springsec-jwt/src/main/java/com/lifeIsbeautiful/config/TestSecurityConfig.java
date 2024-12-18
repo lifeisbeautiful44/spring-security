@@ -1,10 +1,7 @@
 package com.lifeIsbeautiful.config;
 
 import com.lifeIsbeautiful.exception.CustomAuthenticationEntryPoint;
-import com.lifeIsbeautiful.filter.AuthoritiesLoggingAtFilter;
-import com.lifeIsbeautiful.filter.AuthoritiesLoggingFilter;
-import com.lifeIsbeautiful.filter.CsrfCookieFilter;
-import com.lifeIsbeautiful.filter.RequestValidationBeforeFilter;
+import com.lifeIsbeautiful.filter.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +20,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -35,8 +33,7 @@ public class TestSecurityConfig {
 
         CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler = new CsrfTokenRequestAttributeHandler();
 
-        http.securityContext(contextConfig -> contextConfig.requireExplicitSave(false))
-                .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+        http.sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(corsConfigurer -> corsConfigurer.configurationSource(new CorsConfigurationSource() {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
@@ -44,6 +41,7 @@ public class TestSecurityConfig {
                         corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
                         corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
                         corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
+                        corsConfiguration.setExposedHeaders(List.of("Authorization"));
                         corsConfiguration.setAllowCredentials(true);
                         corsConfiguration.setMaxAge(3600l);
                         return corsConfiguration;
@@ -58,6 +56,8 @@ public class TestSecurityConfig {
                 .addFilterAfter(new AuthoritiesLoggingFilter(), BasicAuthenticationFilter.class)
                 .addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
 
+                .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
 
                 .requiresChannel(rrc -> rrc.anyRequest().requiresInsecure()) //only HTTP
                 .authorizeHttpRequests((requests) -> requests
