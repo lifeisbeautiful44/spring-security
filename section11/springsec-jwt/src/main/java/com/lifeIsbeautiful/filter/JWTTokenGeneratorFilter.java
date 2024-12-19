@@ -46,6 +46,7 @@ public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
                 response.setHeader(ApplicationConstant.JWT_HEADER, jwtToken);
             }
         }
+        filterChain.doFilter(request,response);
     }
 
     //Note: If true then skip this filter.
