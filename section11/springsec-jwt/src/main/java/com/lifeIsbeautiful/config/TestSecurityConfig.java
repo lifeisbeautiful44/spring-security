@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -48,7 +50,7 @@ public class TestSecurityConfig {
                     }
                 }))
                 .csrf(csrf -> csrf.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
-                        .ignoringRequestMatchers("/contact", "/register")
+                        .ignoringRequestMatchers("/contact", "/register", "/apiLogin")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
 
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
@@ -70,7 +72,7 @@ public class TestSecurityConfig {
                         .requestMatchers("/myLoans").hasRole("USER")
                         .requestMatchers("/myCards").hasRole("USER")
                         .requestMatchers("/user").authenticated()
-                        .requestMatchers("/contact", "/notices", "/register").permitAll());
+                        .requestMatchers("/contact", "/notices", "/register", "/apiLogin").permitAll());
 
         http.formLogin(withDefaults());
         http.httpBasic(hcc -> hcc.authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
@@ -86,4 +88,13 @@ public class TestSecurityConfig {
 //    public CompromisedPasswordChecker passwordChecker() {
 //        return new HaveIBeenPwnedRestApiPasswordChecker();
 //    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(CustomUserDetailServiceImpl customUserDetailService, PasswordEncoder passwordEncoder) {
+        TestingCustomAuthenticationProvider authenticationProvider = new TestingCustomAuthenticationProvider(customUserDetailService, passwordEncoder);
+
+        ProviderManager providerManager = new ProviderManager(authenticationProvider);
+        providerManager.setEraseCredentialsAfterAuthentication(false);
+        return providerManager;
+    }
 }
