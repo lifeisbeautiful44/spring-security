@@ -26,14 +26,14 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Profile("!prod")
 public class TestSecurityConfig {
 
-    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-uri}")
+/*    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-uri}")
     String introspectionUri;
 
     @Value("${spring.security.oauth2.resourceserver.opaque.introspection-client-id}")
     String clientId;
 
     @Value("${spring.security.oauth2.resourceserver.opaque.introspection-client-secret}")
-    String clientSecret;
+    String clientSecret;*/
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -76,12 +76,12 @@ public class TestSecurityConfig {
                         .requestMatchers("/user").authenticated()
                         .requestMatchers("/contact", "/notices").permitAll());
 
-//        http.oauth2ResourceServer(rsc ->
-//                rsc.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)));
+        http.oauth2ResourceServer(rsc ->
+                rsc.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)));
 
-        http.oauth2ResourceServer(rsc -> rsc.opaqueToken(
-                opaqueTokenConfigurer -> opaqueTokenConfigurer.authenticationConverter(new KeyCloakOpaqueTokenConvertor())
-                        .introspectionUri(this.introspectionUri).introspectionClientCredentials(this.clientId, this.clientSecret)));
+//        http.oauth2ResourceServer(rsc -> rsc.opaqueToken(
+//                opaqueTokenConfigurer -> opaqueTokenConfigurer.authenticationConverter(new KeyCloakOpaqueTokenConvertor())
+//                        .introspectionUri(this.introspectionUri).introspectionClientCredentials(this.clientId, this.clientSecret)));
 
         return http.build();
     }
