@@ -4,6 +4,7 @@ import com.lifeIsbeautiful.exception.CustomAccessDeniedHandler;
 import com.lifeIsbeautiful.exception.CustomAuthenticationEntryPoint;
 import com.lifeIsbeautiful.filter.CsrfCookieFilter;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -72,6 +73,7 @@ public class SecurityConfig {
 
         http.oauth2ResourceServer(rsc ->
                 rsc.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)));
+
         http.exceptionHandling(ehc -> ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));
         return http.build();
     }
