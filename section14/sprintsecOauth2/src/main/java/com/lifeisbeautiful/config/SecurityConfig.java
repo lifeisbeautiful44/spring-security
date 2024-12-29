@@ -27,25 +27,24 @@ public class SecurityConfig {
     @Bean
     ClientRegistrationRepository clientRegistrationRepository() {
         ClientRegistration github = getGithubClient();
-        ClientRegistration facebook = getFacebookClient();
-        return new InMemoryClientRegistrationRepository(github, facebook);
+//        ClientRegistration facebook = getFacebookClient();
+        return new InMemoryClientRegistrationRepository(github);
     }
 
     private ClientRegistration getGithubClient() {
         return CommonOAuth2Provider.GITHUB
                 .getBuilder("github")
-                .clientId("")
-                .clientSecret("")
+                .clientId("Ov23litD4xiXhKQgzk7K")
+                .clientSecret("64eb75ceab3ef50e645375622295a84c0662d3b9")
                 .build();
-
     }
 
-    private ClientRegistration getFacebookClient() {
+/*    private ClientRegistration getFacebookClient() {
         return CommonOAuth2Provider.FACEBOOK
                 .getBuilder("facebook")
                 .clientId("")
                 .clientSecret("")
                 .build();
-    }
+    }*/
 
 }
