@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.lifeisbeautiful</groupId>
-	<artifactId>sprintsecOauth2</artifactId>
+	<artifactId>springsecOauth2</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>sprintsecOauth2</name>
+	<name>springsecOauth2</name>
 	<description>Oauth demo using social login</description>
 	<url/>
 	<licenses>
