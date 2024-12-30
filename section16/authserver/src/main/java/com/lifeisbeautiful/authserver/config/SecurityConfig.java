@@ -12,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
@@ -132,7 +134,7 @@ public class SecurityConfig {
                         .reuseRefreshTokens(false)
                         .build())
                 .build();
-        
+
         return new InMemoryRegisteredClientRepository(clientCredentialFlow, authorizationGrantTypeFlow, pkceGrantTypeFlow);
     }
 
@@ -181,6 +183,11 @@ public class SecurityConfig {
                 });
             }
         };
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
 }
