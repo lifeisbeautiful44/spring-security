@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -39,9 +40,11 @@ import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebSecurity
@@ -101,14 +104,27 @@ public class SecurityConfig {
                 .scopes(scopeConfig -> scopeConfig.addAll(List.of(OidcScopes.OPENID, "ADMIN", "USER")))
                 .tokenSettings(TokenSettings.builder()
                         .accessTokenTimeToLive(Duration.ofMinutes(10))
-                        .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
+                        .accessTokenFormat(OAuth2TokenFormat.REFERENCE)
+                        .build())
+                .build();
+
+        RegisteredClient introspectClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId("lhng_client_introspect")
+                .clientSecret("{noop}JTzrbEBhAlzsrNfM5u696hJE03hTs9B6")
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                .scopes(scopeConfig -> scopeConfig.addAll(List.of(OidcScopes.OPENID, "ADMIN", "USER")))
+                .tokenSettings(TokenSettings.builder()
+                        .accessTokenTimeToLive(Duration.ofMinutes(10))
+                        .accessTokenFormat(OAuth2TokenFormat.REFERENCE)
                         .build())
                 .build();
 
         RegisteredClient authorizationGrantTypeFlow = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("auth-code-flow")
-                .clientSecret("{noop}WrfddzQj4zwFNfXxDPEy0bVgrK6UR1Rt")
+                .clientSecret("{noop}WrfddzQj4zwFNfXxDPEy0bVgrK6UR1BT")
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .scope(OidcScopes.OPENID).scope(OidcScopes.EMAIL)
                 .redirectUri("https://oauth.pstmn.io/v1/callback")
@@ -123,6 +139,7 @@ public class SecurityConfig {
         RegisteredClient pkceGrantTypeFlow = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("pkce-code-flow")
                 .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .scope(OidcScopes.OPENID).scope(OidcScopes.EMAIL)
                 .redirectUri("https://oauth.pstmn.io/v1/callback")
@@ -135,7 +152,7 @@ public class SecurityConfig {
                         .build())
                 .build();
 
-        return new InMemoryRegisteredClientRepository(clientCredentialFlow, authorizationGrantTypeFlow, pkceGrantTypeFlow);
+        return new InMemoryRegisteredClientRepository(clientCredentialFlow, introspectClient, authorizationGrantTypeFlow, pkceGrantTypeFlow);
     }
 
     @Bean
@@ -178,8 +195,16 @@ public class SecurityConfig {
         return (context) -> {
             if (context.getTokenType().equals(OAuth2TokenType.ACCESS_TOKEN)) {
                 context.getClaims().claims((claims) -> {
-                    Set<String> roles = context.getClaims().build().getClaim("scope");
-                    claims.put("roles", roles);
+                    if (context.getAuthorizationGrantType().equals(AuthorizationGrantType.CLIENT_CREDENTIALS)) {
+                        Set<String> roles = context.getClaims().build().getClaim("scope");
+                        claims.put("roles", roles);
+                    } else if (context.getAuthorizationGrantType().equals(AuthorizationGrantType.AUTHORIZATION_CODE)) {
+                        Set<String> roles = AuthorityUtils.authorityListToSet(context.getPrincipal().getAuthorities())
+                                .stream()
+                                .map(c -> c.replaceFirst("^ROLE_", ""))
+                                .collect(Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet));
+                        claims.put("roles", roles);
+                    }
                 });
             }
         };
