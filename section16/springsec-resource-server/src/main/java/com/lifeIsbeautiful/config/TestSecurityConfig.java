@@ -2,7 +2,6 @@ package com.lifeIsbeautiful.config;
 
 import com.lifeIsbeautiful.filter.CsrfCookieFilter;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -23,14 +22,14 @@ import java.util.List;
 @Profile("!prod")
 public class TestSecurityConfig {
 
-    @Value("${spring.security.oauth2.resourceserver.opaque.introspection-uri}")
+   /* @Value("${spring.security.oauth2.resourceserver.opaque.introspection-uri}")
     String introspectionUri;
 
     @Value("${spring.security.oauth2.resourceserver.opaque.introspection-client-id}")
     String clientId;
 
     @Value("${spring.security.oauth2.resourceserver.opaque.introspection-client-secret}")
-    String clientSecret;
+    String clientSecret;*/
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -73,12 +72,12 @@ public class TestSecurityConfig {
                         .requestMatchers("/user").authenticated()
                         .requestMatchers("/contact", "/notices").permitAll());
 
-//        http.oauth2ResourceServer(rsc ->
-//                rsc.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)));
+        http.oauth2ResourceServer(rsc ->
+                rsc.jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)));
 
-        http.oauth2ResourceServer(rsc -> rsc.opaqueToken(
-                opaqueTokenConfigurer -> opaqueTokenConfigurer.authenticationConverter(new OpaqueTokenConvertor())
-                        .introspectionUri(this.introspectionUri).introspectionClientCredentials(this.clientId, this.clientSecret)));
+//        http.oauth2ResourceServer(rsc -> rsc.opaqueToken(
+//                opaqueTokenConfigurer -> opaqueTokenConfigurer.authenticationConverter(new OpaqueTokenConvertor())
+//                        .introspectionUri(this.introspectionUri).introspectionClientCredentials(this.clientId, this.clientSecret)));
 
         return http.build();
     }
